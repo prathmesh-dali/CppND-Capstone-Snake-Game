@@ -11,6 +11,9 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
         for(FoodType type: food_type_list){
           auto food = std::make_shared<Food>(type);
           PlaceFood(food);
+          if(type != FoodType::kFood){
+            food->SetFoodInactive();
+          }
           food_list.emplace_back(food);
         }  
 }
