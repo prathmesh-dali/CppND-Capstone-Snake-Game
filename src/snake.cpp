@@ -55,6 +55,9 @@ void Snake::MarkSnakeDead(int* score){
   dizzi_cond.notify_all();
   std::string msg{"Score: " + std::to_string(*score) + "\n Size: " + std::to_string(size)};
   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over!", msg.c_str(), NULL);
+  SDL_Event ev;
+  ev.type = SDL_QUIT;
+  SDL_PushEvent(&ev);
 }
 
 void Snake::UpdateBody(SDL_Point &current_head_cell, SDL_Point &prev_head_cell, int* score) {
