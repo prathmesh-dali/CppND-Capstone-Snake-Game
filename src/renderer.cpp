@@ -44,7 +44,11 @@ void Renderer::Render(std::shared_ptr<Snake> const snake, std::vector<std::share
   block.h = screen_height / grid_height;
 
   // Clear screen
-  SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
+  if(snake->GetDizzing()){
+    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x1E, 0x1E, 0xFF);
+  } else {
+    SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
+  }
   SDL_RenderClear(sdl_renderer);
 
   // Render food

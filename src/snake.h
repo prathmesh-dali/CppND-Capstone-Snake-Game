@@ -33,6 +33,8 @@ class Snake {
   std::vector<SDL_Point> body;
   bool GetBoosting();
   void BoostSnake();
+  void DizziSnake();
+  bool GetDizzing();
   
  private:
   void UpdateHead();
@@ -42,6 +44,7 @@ class Snake {
   bool dizzing{false};
   bool boosting{false};
   std::condition_variable booster_cond;
+  std::condition_variable dizzi_cond;
   int grid_width;
   int grid_height;
   std::mutex mutex;

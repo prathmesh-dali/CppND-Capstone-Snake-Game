@@ -22,19 +22,19 @@ void Snake::Update() {
 void Snake::UpdateHead() {
   switch (direction) {
     case Direction::kUp:
-      head_y -= (speed + GetBoosting() * 0.2);
+      head_y -= (speed + GetBoosting() * 0.1);
       break;
 
     case Direction::kDown:
-      head_y += (speed + GetBoosting() * 0.2);
+      head_y += (speed + GetBoosting() * 0.1);
       break;
 
     case Direction::kLeft:
-      head_x -= (speed + GetBoosting() * 0.2);
+      head_x -= (speed + GetBoosting() * 0.1);
       break;
 
     case Direction::kRight:
-      head_x += (speed + GetBoosting() * 0.2);
+      head_x += (speed + GetBoosting() * 0.1);
       break;
   }
 
@@ -162,8 +162,33 @@ void Snake::BoostSnake(){
   }).detach();
 }
 
+void Snake::DizziSnake(){
+  std::thread([this](){
+    if(alive){
+      std::unique_lock<std::mutex> uLock(mutex);
+      if(dizzing){
+        dizzi_cond.wait(uLock);
+      }
+      if(alive){
+        dizzing = true;
+        uLock.unlock();
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        uLock.lock();
+        dizzing =false;
+        uLock.unlock();
+        dizzi_cond.notify_one();
+      }
+    }
+  }).detach();
+}
+
 
 bool Snake::GetBoosting(){
   std::lock_guard<std::mutex> lock(mutex);
   return boosting;
+}
+
+bool Snake::GetDizzing(){
+  std::lock_guard<std::mutex> lock(mutex);
+  return dizzing;
 }

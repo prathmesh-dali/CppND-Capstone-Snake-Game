@@ -124,6 +124,7 @@ void Game::Update() {
 
       case FoodType::kRotten:
         PlaceFood(food);
+        snake->DizziSnake();
         break;
 
       default:

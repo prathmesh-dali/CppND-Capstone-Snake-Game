@@ -5,7 +5,11 @@
 
 void Controller::ChangeDirection(std::shared_ptr<Snake> snake, Snake::Direction input,
                                  Snake::Direction opposite) const {
-  if (snake->direction != opposite || snake->size == 1) snake->direction = input;
+  if(snake->GetDizzing()){
+    if (snake->direction != input || snake->size == 1) snake->direction = opposite;
+  } else {
+    if (snake->direction != opposite || snake->size == 1) snake->direction = input;
+  }
   return;
 }
 
