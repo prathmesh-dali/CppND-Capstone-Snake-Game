@@ -8,15 +8,19 @@
 #include "renderer.h"
 #include "snake.h"
 #include "food.h"
+#include "enums.h"
 
 class Game {
  public:
   Game(std::size_t grid_width, std::size_t grid_height);
   ~Game();
-  void Run(Controller const &controller, Renderer &renderer,
+  void Run(Controller const &controller, std::shared_ptr<Renderer> renderer,
            std::size_t target_frame_duration);
   int GetScore() const;
   int GetSize() const;
+  GameStatus GetStatus() const;
+  void UpdateStatus(GameStatus status);
+  void ToggleStatus();
 
  private:
   std::shared_ptr<Snake> snake;
@@ -29,9 +33,11 @@ class Game {
   std::uniform_int_distribution<int> random_h;
 
   int score{0};
+  GameStatus status{GameStatus::kRunning};
+  // bool paused{false};
   bool InFoodList(int x, int y, FoodType type);
   void PlaceFood(std::shared_ptr<Food>);
-  void Update();
+  void Update(std::shared_ptr<Renderer> renderer);
 };
 
 #endif

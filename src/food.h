@@ -5,9 +5,7 @@
 #include <random>
 #include <thread>
 #include <mutex>
-
-enum class FoodType {kFood, kPoison, kBooster, kRotten};
-enum class FoodStatus {kActive, kInactive};
+#include <enums.h>
 
 class Food: public SDL_Point {
     public:
@@ -15,7 +13,7 @@ class Food: public SDL_Point {
         ~Food();
         FoodType GetFoodType() const;
         FoodStatus GetFoodStatus();
-        bool gameRunning{true};
+        void UpdateGameStatus(GameStatus gameStatus);
     
     protected:
         std::thread t;
@@ -23,12 +21,12 @@ class Food: public SDL_Point {
     private:
         FoodStatus status_;
         FoodType type_;
-        long statusChangeTimeout_;
         void ToggleStatus();
         std::random_device dev_;
         std::mt19937 engine_;
-        std::uniform_int_distribution<int> randomTimeout_;
+        std::uniform_int_distribution<int> random_timeout_;
         std::mutex mutex_;
+        GameStatus game_status_;
 };
 
 #endif

@@ -5,7 +5,9 @@
 #include <thread>
 #include <condition_variable>
 #include <mutex>
+#include <chrono>
 #include "SDL.h"
+#include "enums.h"
 
 class Snake {
  public:
@@ -35,6 +37,7 @@ class Snake {
   void BoostSnake();
   void DizziSnake();
   bool GetDizzing();
+  void UpdateGameStatus(GameStatus gameStatus);
   
  private:
   void UpdateHead();
@@ -48,6 +51,8 @@ class Snake {
   int grid_width;
   int grid_height;
   std::mutex mutex;
+  std::chrono::time_point<std::chrono::high_resolution_clock> gamePausedTime;
+  GameStatus gameStatus{false};
 };
 
 #endif

@@ -152,7 +152,19 @@ void Snake::BoostSnake(){
       if(alive){
         boosting = true;
         uLock.unlock();
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        auto startTime = std::chrono::high_resolution_clock::now();
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        auto timeDiff = currentTime - startTime;
+        while(std::chrono::duration_cast<std::chrono::milliseconds>(timeDiff).count()<=5000){
+          std::this_thread::sleep_for(std::chrono::milliseconds(1));
+          currentTime = std::chrono::high_resolution_clock::now();
+          if(gameStatus == GameStatus::kPaused){
+            auto gamePausedTime = std::chrono::high_resolution_clock::now();
+            auto gameExecTime = startTime - gamePausedTime;
+            startTime = currentTime - gameExecTime;
+          } 
+          timeDiff = currentTime - startTime;
+        }
         uLock.lock();
         boosting =false;
         uLock.unlock();
@@ -172,7 +184,19 @@ void Snake::DizziSnake(){
       if(alive){
         dizzing = true;
         uLock.unlock();
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        auto startTime = std::chrono::high_resolution_clock::now();
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        auto timeDiff = currentTime - startTime;
+        while(std::chrono::duration_cast<std::chrono::milliseconds>(timeDiff).count()<=5000){
+          std::this_thread::sleep_for(std::chrono::milliseconds(1));
+          currentTime = std::chrono::high_resolution_clock::now();
+          if(gameStatus == GameStatus::kPaused){
+            auto gamePausedTime = std::chrono::high_resolution_clock::now();
+            auto gameExecTime = startTime - gamePausedTime;
+            startTime = currentTime - gameExecTime;
+          } 
+          timeDiff = currentTime - startTime;
+        }
         uLock.lock();
         dizzing =false;
         uLock.unlock();
@@ -191,4 +215,10 @@ bool Snake::GetBoosting(){
 bool Snake::GetDizzing(){
   std::lock_guard<std::mutex> lock(mutex);
   return dizzing;
+}
+
+void Snake::UpdateGameStatus(GameStatus gameStatus){
+  std::lock_guard<std::mutex> lock(mutex);
+  this->gameStatus = gameStatus;
+  this->gamePausedTime = std::chrono::high_resolution_clock::now();
 }

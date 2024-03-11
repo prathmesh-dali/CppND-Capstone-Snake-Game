@@ -3,13 +3,15 @@
 
 #include "snake.h"
 
+class Game;
+
 class Controller {
  public:
-  void HandleInput(bool &running, std::shared_ptr<Snake> snake) const;
+  void HandleInput(std::shared_ptr<Snake> snake, Game &game) const;
 
  private:
   void ChangeDirection(std::shared_ptr<Snake> snake, Snake::Direction input,
-                       Snake::Direction opposite) const;
+                       Snake::Direction opposite, GameStatus gameStatus) const;
 };
 
 #endif

@@ -113,3 +113,8 @@ void Renderer::UpdateWindowTitle(int score, int fps) {
   std::string title{"Snake Score: " + std::to_string(score) + " FPS: " + std::to_string(fps)};
   SDL_SetWindowTitle(sdl_window, title.c_str());
 }
+
+void Renderer::UpdateWindowTitlePaused(int score) {
+  std::string title{"The game is paused. Press ESC to Resume. Snake Score: " + std::to_string(score)};
+  SDL_SetWindowTitle(sdl_window, title.c_str());
+}

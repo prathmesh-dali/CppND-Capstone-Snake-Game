@@ -14,6 +14,7 @@ class Renderer {
 
   void Render(std::shared_ptr<Snake> const snake, std::vector<std::shared_ptr<Food>> const food_list);
   void UpdateWindowTitle(int score, int fps);
+  void UpdateWindowTitlePaused(int score);
 
  private:
   SDL_Window *sdl_window;

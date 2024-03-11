@@ -17,26 +17,26 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
 
 Game::~Game(){
   for(auto food: food_list){
-    food->gameRunning = false;
+    food->UpdateGameStatus(GameStatus::kClosed);
   }
 }
 
-void Game::Run(Controller const &controller, Renderer &renderer,
+void Game::Run(Controller const &controller, std::shared_ptr<Renderer> renderer,
                std::size_t target_frame_duration) {
   Uint32 title_timestamp = SDL_GetTicks();
   Uint32 frame_start;
   Uint32 frame_end;
   Uint32 frame_duration;
   int frame_count = 0;
-  bool running = true;
+  // GameStatus running = GameStatus::kRunning;
 
-  while (running) {
+  while (status != GameStatus::kClosed) {
     frame_start = SDL_GetTicks();
 
     // Input, Update, Render - the main game loop.
-    controller.HandleInput(running, snake);
-    Update();
-    renderer.Render(snake, food_list);
+    controller.HandleInput(snake, *this);
+    Update(renderer);
+    renderer->Render(snake, food_list);
 
     frame_end = SDL_GetTicks();
 
@@ -47,7 +47,12 @@ void Game::Run(Controller const &controller, Renderer &renderer,
 
     // After every second, update the window title.
     if (frame_end - title_timestamp >= 1000) {
-      renderer.UpdateWindowTitle(score, frame_count);
+      if(status == GameStatus::kRunning){
+        renderer->UpdateWindowTitle(score, frame_count);
+      } else if(status == GameStatus::kPaused){
+        renderer->UpdateWindowTitlePaused(score);
+      } 
+      
       frame_count = 0;
       title_timestamp = frame_end;
     }
@@ -88,7 +93,12 @@ void Game::PlaceFood(std::shared_ptr<Food> food) {
   }
 }
 
-void Game::Update() {
+void Game::Update(std::shared_ptr<Renderer> renderer) {
+
+  if(status == GameStatus::kPaused){
+    return;
+  }
+
   if (!snake->alive) return;
 
   snake->Update();
@@ -134,5 +144,18 @@ void Game::Update() {
   }
 }
 
+void Game::UpdateStatus(GameStatus status){
+  this->status = status;
+  for(auto food: food_list){
+    food->UpdateGameStatus(status);
+  }
+  snake->UpdateGameStatus(status);
+}
+
+void Game::ToggleStatus(){
+  UpdateStatus(status == GameStatus::kRunning ? GameStatus::kPaused : GameStatus::kRunning);
+}
+
+GameStatus Game::GetStatus() const { return status; }
 int Game::GetScore() const { return score; }
 int Game::GetSize() const { return snake->size; }
