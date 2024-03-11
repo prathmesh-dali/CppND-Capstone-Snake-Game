@@ -96,11 +96,14 @@ void Game::PlaceFood(std::shared_ptr<Food> food) {
 
 void Game::Update(std::shared_ptr<Renderer> renderer) {
 
-  if(status == GameStatus::kPaused){
+  if(status != GameStatus::kRunning){
     return;
   }
 
-  if (!snake->alive) return;
+  if (!snake->alive) {
+    UpdateStatus(GameStatus::kFinished);
+    return;
+  }
 
   snake->Update();
 
@@ -147,8 +150,8 @@ void Game::Update(std::shared_ptr<Renderer> renderer) {
   }
 }
 
-void Game::UpdateStatus(GameStatus status){
-  this->status = status;
+void Game::UpdateStatus(GameStatus gameStatus){
+  status = gameStatus;
   for(auto food: food_list){
     food->UpdateGameStatus(status);
   }

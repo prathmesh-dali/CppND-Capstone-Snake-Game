@@ -20,7 +20,7 @@ void Food::UpdateGameStatus(GameStatus gameStatus){
 void Food::ToggleStatus(){
     auto startTime = std::chrono::high_resolution_clock::now();
     int statusChangeTimeout = random_timeout_(engine_);
-    while(game_status_ !=GameStatus::kClosed){
+    while(game_status_ !=GameStatus::kClosed && game_status_ != GameStatus::kFinished){
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         
         auto currentTime = std::chrono::high_resolution_clock::now();

@@ -65,6 +65,7 @@ void Snake::UpdateBody(SDL_Point &current_head_cell, SDL_Point &prev_head_cell) 
     if (current_head_cell.x == item.x && current_head_cell.y == item.y) {
       alive = false;
       booster_cond.notify_all();
+      dizzi_cond.notify_all();
     }
   }
 }
@@ -84,62 +85,6 @@ bool Snake::SnakeCell(int x, int y) {
   }
   return false;
 }
-
-// One Working
-
-/*
-void Snake::BoostSnake(){
-  std::thread boostThread([this](){
-    if(alive){
-      std::unique_lock<std::mutex> uLock(mutex);
-      if(boosting){
-        booster_cond.wait(uLock);
-      }
-      auto startTime = std::chrono::high_resolution_clock::now();
-      // uLock.lock();
-      boosting = true;
-      // uLock.unlock();
-      while(alive){
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        auto timeDiff = currentTime - startTime;
-        if(std::chrono::duration_cast<std::chrono::milliseconds>(timeDiff).count() > 5000){
-          // uLock.lock();
-          boosting =false;
-        booster_cond.notify_all();
-        // uLock.unlock();
-        }
-        // uLock.lock();
-      }
-    }
-  });
-  boostThread.detach();
-}
-*/
-
-// void TimerThread(bool *alive, bool* boosting, std::condition_variable* booster_cond, std::mutex* mutex){
-//     if(*alive){
-//       std::unique_lock<std::mutex> uLock(*mutex);
-//       if(*boosting){
-//         booster_cond->wait(uLock);
-//       }
-//       if(*alive){
-//         // uLock.lock();
-//         *boosting = true;
-//         uLock.unlock();
-//         std::this_thread::sleep_for(std::chrono::seconds(5));
-//         uLock.lock();
-//         *boosting =false;
-//         uLock.unlock();
-//         booster_cond->notify_one();
-//       }
-//     }
-//   }
-
-// void Snake::BoostSnake(){
-//   std::thread boosterTimer(TimerThread, &alive, &boosting, &booster_cond, &mutex);
-//   boosterTimer.detach();
-// }
 
 
 void Snake::BoostSnake(){
