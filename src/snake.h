@@ -2,6 +2,9 @@
 #define SNAKE_H
 
 #include <vector>
+#include <thread>
+#include <condition_variable>
+#include <mutex>
 #include "SDL.h"
 
 class Snake {
@@ -28,15 +31,20 @@ class Snake {
   float head_x;
   float head_y;
   std::vector<SDL_Point> body;
-
+  bool GetBoosting();
+  void BoostSnake();
+  
  private:
   void UpdateHead();
   void UpdateBody(SDL_Point &current_cell, SDL_Point &prev_cell);
-
   bool growing{false};
   bool shrinking{false};
+  bool dizzing{false};
+  bool boosting{false};
+  std::condition_variable booster_cond;
   int grid_width;
   int grid_height;
+  std::mutex mutex;
 };
 
 #endif

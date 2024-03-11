@@ -12,7 +12,7 @@ class Renderer {
            const std::size_t grid_width, const std::size_t grid_height);
   ~Renderer();
 
-  void Render(Snake const snake, std::vector<std::shared_ptr<Food>> food_list);
+  void Render(std::shared_ptr<Snake> const snake, std::vector<std::shared_ptr<Food>> const food_list);
   void UpdateWindowTitle(int score, int fps);
 
  private:

@@ -19,7 +19,7 @@ class Game {
   int GetSize() const;
 
  private:
-  Snake snake;
+  std::shared_ptr<Snake> snake;
   std::vector<std::shared_ptr<Food>> food_list;
   std::vector<FoodType> const food_type_list{FoodType::kFood, FoodType::kBooster, FoodType::kPoison, FoodType::kRotten};
 

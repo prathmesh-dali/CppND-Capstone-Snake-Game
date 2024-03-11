@@ -3,7 +3,7 @@
 #include "SDL.h"
 
 Game::Game(std::size_t grid_width, std::size_t grid_height)
-    : snake(grid_width, grid_height),
+    : snake(std::make_shared<Snake>(grid_width, grid_height)),
       engine(dev()),
       random_w(0, static_cast<int>(grid_width - 1)),
       random_h(0, static_cast<int>(grid_height - 1)) {
@@ -80,7 +80,7 @@ void Game::PlaceFood(std::shared_ptr<Food> food) {
     y = random_h(engine);
     // Check that the location is not occupied by a snake item before placing
     // food.
-    if (!snake.SnakeCell(x, y) && !InFoodList(x, y, food->GetFoodType())) {
+    if (!snake->SnakeCell(x, y) && !InFoodList(x, y, food->GetFoodType())) {
       food->x = x;
       food->y = y;
       return;
@@ -89,12 +89,12 @@ void Game::PlaceFood(std::shared_ptr<Food> food) {
 }
 
 void Game::Update() {
-  if (!snake.alive) return;
+  if (!snake->alive) return;
 
-  snake.Update();
+  snake->Update();
 
-  int new_x = static_cast<int>(snake.head_x);
-  int new_y = static_cast<int>(snake.head_y);
+  int new_x = static_cast<int>(snake->head_x);
+  int new_y = static_cast<int>(snake->head_y);
 
   // Check if there's food over here
   for(auto food : food_list){
@@ -105,20 +105,20 @@ void Game::Update() {
         score++;
         PlaceFood(food);
         // Grow snake and increase speed.
-        snake.GrowBody();
-        snake.speed += 0.02; 
+        snake->GrowBody();
+        snake->speed += 0.02; 
         break;
       
       case FoodType::kBooster:
         PlaceFood(food);
-        snake.speed +=0.02;
+        snake->BoostSnake();
         break;
       
       case FoodType::kPoison:
         PlaceFood(food);
-        if(snake.size > 1){
-          snake.speed -=0.02;
-          snake.ShrinkBody();
+        if(snake->size > 1){
+          snake->speed -=0.02;
+          snake->ShrinkBody();
         }
         break;
 
@@ -134,4 +134,4 @@ void Game::Update() {
 }
 
 int Game::GetScore() const { return score; }
-int Game::GetSize() const { return snake.size; }
+int Game::GetSize() const { return snake->size; }
