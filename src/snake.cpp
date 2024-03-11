@@ -38,7 +38,7 @@ void Snake::UpdateHead(bool* wall_enabled, int* score) {
       break;
   }
 
-  if(wall_enabled){
+  if(*wall_enabled){
     if(head_x > grid_width || head_x < 0 || head_y > grid_height || head_y < 0){
       MarkSnakeDead(score);
     }
