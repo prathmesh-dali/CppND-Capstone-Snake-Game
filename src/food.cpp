@@ -34,6 +34,7 @@ void Food::ToggleStatus(){
             std::unique_lock<std::mutex> uLock(mutex_);
 
             status_ = status_ == FoodStatus::kActive? FoodStatus::kInactive : FoodStatus::kActive;
+            location_updated_ = false;
 
             uLock.unlock();
             statusChangeTimeout = random_timeout_(engine_);
@@ -45,6 +46,21 @@ void Food::ToggleStatus(){
 FoodStatus Food::GetFoodStatus(){
     std::lock_guard<std::mutex> lock(mutex_);
     return status_;
+}
+
+void Food::SetFoodInactive(){
+    std::lock_guard<std::mutex> lock(mutex_);
+    status_ = FoodStatus::kInactive;
+}
+
+void Food::SetLocationUpdated(){
+    std::lock_guard<std::mutex> lock(mutex_);
+    location_updated_ = true;
+}
+
+bool Food::IsLocationUpdated(){
+    std::lock_guard<std::mutex> lock(mutex_);
+    return location_updated_;
 }
 
 FoodType Food::GetFoodType() const{

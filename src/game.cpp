@@ -88,6 +88,7 @@ void Game::PlaceFood(std::shared_ptr<Food> food) {
     if (!snake->SnakeCell(x, y) && !InFoodList(x, y, food->GetFoodType())) {
       food->x = x;
       food->y = y;
+      food->SetLocationUpdated();
       return;
     }
   }
@@ -121,11 +122,13 @@ void Game::Update(std::shared_ptr<Renderer> renderer) {
       
       case FoodType::kBooster:
         PlaceFood(food);
+        food->SetFoodInactive();
         snake->BoostSnake();
         break;
       
       case FoodType::kPoison:
         PlaceFood(food);
+        food->SetFoodInactive();
         if(snake->size > 1){
           snake->speed -=0.02;
           snake->ShrinkBody();
@@ -134,12 +137,12 @@ void Game::Update(std::shared_ptr<Renderer> renderer) {
 
       case FoodType::kRotten:
         PlaceFood(food);
+        food->SetFoodInactive();
         snake->DizziSnake();
         break;
-
-      default:
-        break;
       }
+  } else if(food->GetFoodStatus() == FoodStatus::kInactive && !food->IsLocationUpdated()){
+    PlaceFood(food);
   }
   }
 }
