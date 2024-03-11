@@ -19,7 +19,7 @@ class Snake {
         head_x(grid_width / 2),
         head_y(grid_height / 2) {}
 
-  void Update();
+  void Update(bool* wall_enabled, int* score);
 
   void GrowBody();
   void ShrinkBody();
@@ -40,8 +40,8 @@ class Snake {
   void UpdateGameStatus(GameStatus gameStatus);
   
  private:
-  void UpdateHead();
-  void UpdateBody(SDL_Point &current_cell, SDL_Point &prev_cell);
+  void UpdateHead(bool* wall_enabled, int* score);
+  void UpdateBody(SDL_Point &current_cell, SDL_Point &prev_cell, int* score);
   bool growing{false};
   bool shrinking{false};
   bool dizzing{false};
@@ -52,7 +52,8 @@ class Snake {
   int grid_height;
   std::mutex mutex;
   std::chrono::time_point<std::chrono::high_resolution_clock> gamePausedTime;
-  GameStatus gameStatus{false};
+  GameStatus game_status{false};
+  void MarkSnakeDead(int* score);
 };
 
 #endif

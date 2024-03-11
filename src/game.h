@@ -21,6 +21,7 @@ class Game {
   GameStatus GetStatus() const;
   void UpdateStatus(GameStatus status);
   void ToggleStatus();
+  void ToggleWall();
 
  private:
   std::shared_ptr<Snake> snake;
@@ -38,6 +39,7 @@ class Game {
   bool InFoodList(int x, int y, FoodType type);
   void PlaceFood(std::shared_ptr<Food>);
   void Update(std::shared_ptr<Renderer> renderer);
+  bool wall_enabled_{false};
 };
 
 #endif

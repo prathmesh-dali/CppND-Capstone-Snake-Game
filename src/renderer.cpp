@@ -38,7 +38,7 @@ Renderer::~Renderer() {
   SDL_Quit();
 }
 
-void Renderer::Render(std::shared_ptr<Snake> const snake, std::vector<std::shared_ptr<Food>> const food_list) {
+void Renderer::Render(std::shared_ptr<Snake> const snake, std::vector<std::shared_ptr<Food>> const food_list, bool* wall_enabled) {
   SDL_Rect block;
   block.w = screen_width / grid_width;
   block.h = screen_height / grid_height;
@@ -50,6 +50,12 @@ void Renderer::Render(std::shared_ptr<Snake> const snake, std::vector<std::share
     SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
   }
   SDL_RenderClear(sdl_renderer);
+
+  if(*wall_enabled){
+    SDL_SetRenderDrawColor(sdl_renderer , 0x7E, 0x41, 0x1F, 0xFF);  // brown
+    SDL_Rect box = { 0 ,0 , 640 , 640}; // rectangle around the window
+    SDL_RenderDrawRect(sdl_renderer , &box);
+  }
 
   // Render food
   for(auto food : food_list){

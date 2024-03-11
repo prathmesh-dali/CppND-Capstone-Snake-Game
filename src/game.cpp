@@ -36,7 +36,7 @@ void Game::Run(Controller const &controller, std::shared_ptr<Renderer> renderer,
     // Input, Update, Render - the main game loop.
     controller.HandleInput(snake, *this);
     Update(renderer);
-    renderer->Render(snake, food_list);
+    renderer->Render(snake, food_list, &wall_enabled_);
 
     frame_end = SDL_GetTicks();
 
@@ -105,7 +105,7 @@ void Game::Update(std::shared_ptr<Renderer> renderer) {
     return;
   }
 
-  snake->Update();
+  snake->Update(&wall_enabled_, &score);
 
   int new_x = static_cast<int>(snake->head_x);
   int new_y = static_cast<int>(snake->head_y);
@@ -160,6 +160,10 @@ void Game::UpdateStatus(GameStatus gameStatus){
 
 void Game::ToggleStatus(){
   UpdateStatus(status == GameStatus::kRunning ? GameStatus::kPaused : GameStatus::kRunning);
+}
+
+void Game::ToggleWall(){
+  wall_enabled_ = !wall_enabled_;
 }
 
 GameStatus Game::GetStatus() const { return status; }

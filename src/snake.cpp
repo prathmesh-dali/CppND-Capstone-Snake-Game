@@ -2,12 +2,12 @@
 #include <cmath>
 #include <iostream>
 
-void Snake::Update() {
+void Snake::Update(bool* wall_eanbled, int* score) {
   SDL_Point prev_cell{
       static_cast<int>(head_x),
       static_cast<int>(
           head_y)};  // We first capture the head's cell before updating.
-  UpdateHead();
+  UpdateHead(wall_eanbled, score);
   SDL_Point current_cell{
       static_cast<int>(head_x),
       static_cast<int>(head_y)};  // Capture the head's cell after updating.
@@ -15,11 +15,11 @@ void Snake::Update() {
   // Update all of the body vector items if the snake head has moved to a new
   // cell.
   if (current_cell.x != prev_cell.x || current_cell.y != prev_cell.y) {
-    UpdateBody(current_cell, prev_cell);
+    UpdateBody(current_cell, prev_cell, score);
   }
 }
 
-void Snake::UpdateHead() {
+void Snake::UpdateHead(bool* wall_enabled, int* score) {
   switch (direction) {
     case Direction::kUp:
       head_y -= (speed + GetBoosting() * 0.1);
@@ -38,12 +38,26 @@ void Snake::UpdateHead() {
       break;
   }
 
+  if(wall_enabled){
+    if(head_x > grid_width || head_x < 0 || head_y > grid_height || head_y < 0){
+      MarkSnakeDead(score);
+    }
+  }
+
   // Wrap the Snake around to the beginning if going off of the screen.
   head_x = fmod(head_x + grid_width, grid_width);
   head_y = fmod(head_y + grid_height, grid_height);
 }
 
-void Snake::UpdateBody(SDL_Point &current_head_cell, SDL_Point &prev_head_cell) {
+void Snake::MarkSnakeDead(int* score){
+  alive = false;
+  booster_cond.notify_all();
+  dizzi_cond.notify_all();
+  std::string msg{"Score: " + std::to_string(*score) + "\n Size: " + std::to_string(size)};
+  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over!", msg.c_str(), NULL);
+}
+
+void Snake::UpdateBody(SDL_Point &current_head_cell, SDL_Point &prev_head_cell, int* score) {
   // Add previous head location to vector
   body.push_back(prev_head_cell);
 
@@ -63,9 +77,7 @@ void Snake::UpdateBody(SDL_Point &current_head_cell, SDL_Point &prev_head_cell) 
   // Check if the snake has died.
   for (auto const &item : body) {
     if (current_head_cell.x == item.x && current_head_cell.y == item.y) {
-      alive = false;
-      booster_cond.notify_all();
-      dizzi_cond.notify_all();
+      MarkSnakeDead(score);
     }
   }
 }
@@ -103,7 +115,7 @@ void Snake::BoostSnake(){
         while(std::chrono::duration_cast<std::chrono::milliseconds>(timeDiff).count()<=5000){
           std::this_thread::sleep_for(std::chrono::milliseconds(1));
           currentTime = std::chrono::high_resolution_clock::now();
-          if(gameStatus == GameStatus::kPaused){
+          if(game_status == GameStatus::kPaused){
             auto gamePausedTime = std::chrono::high_resolution_clock::now();
             auto gameExecTime = startTime - gamePausedTime;
             startTime = currentTime - gameExecTime;
@@ -135,7 +147,7 @@ void Snake::DizziSnake(){
         while(std::chrono::duration_cast<std::chrono::milliseconds>(timeDiff).count()<=5000){
           std::this_thread::sleep_for(std::chrono::milliseconds(1));
           currentTime = std::chrono::high_resolution_clock::now();
-          if(gameStatus == GameStatus::kPaused){
+          if(game_status == GameStatus::kPaused){
             auto gamePausedTime = std::chrono::high_resolution_clock::now();
             auto gameExecTime = startTime - gamePausedTime;
             startTime = currentTime - gameExecTime;
@@ -164,6 +176,6 @@ bool Snake::GetDizzing(){
 
 void Snake::UpdateGameStatus(GameStatus gameStatus){
   std::lock_guard<std::mutex> lock(mutex);
-  this->gameStatus = gameStatus;
+  this->game_status = gameStatus;
   this->gamePausedTime = std::chrono::high_resolution_clock::now();
 }

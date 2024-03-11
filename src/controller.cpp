@@ -46,6 +46,10 @@ void Controller::HandleInput(std::shared_ptr<Snake> snake, Game &game) const {
         case SDLK_ESCAPE:
           game.ToggleStatus();
           break;
+
+        case SDLK_w:
+          game.ToggleWall();
+          break;
       }
     }
   }
