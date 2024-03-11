@@ -7,7 +7,18 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
       engine(dev()),
       random_w(0, static_cast<int>(grid_width - 1)),
       random_h(0, static_cast<int>(grid_height - 1)) {
-  PlaceFood();
+        
+        for(FoodType type: food_type_list){
+          auto food = std::make_shared<Food>(type);
+          PlaceFood(food);
+          food_list.emplace_back(food);
+        }  
+}
+
+Game::~Game(){
+  for(auto food: food_list){
+    food->gameRunning = false;
+  }
 }
 
 void Game::Run(Controller const &controller, Renderer &renderer,
@@ -25,7 +36,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
     // Input, Update, Render - the main game loop.
     controller.HandleInput(running, snake);
     Update();
-    renderer.Render(snake, food);
+    renderer.Render(snake, food_list);
 
     frame_end = SDL_GetTicks();
 
@@ -50,16 +61,28 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   }
 }
 
-void Game::PlaceFood() {
+bool Game::InFoodList(int x, int y, FoodType type){
+  for (auto food : food_list) {
+    if(food->GetFoodType() == type){
+      continue;
+    }
+    if (x == food->x && y == food->y) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void Game::PlaceFood(std::shared_ptr<Food> food) {
   int x, y;
   while (true) {
     x = random_w(engine);
     y = random_h(engine);
     // Check that the location is not occupied by a snake item before placing
     // food.
-    if (!snake.SnakeCell(x, y)) {
-      food.x = x;
-      food.y = y;
+    if (!snake.SnakeCell(x, y) && !InFoodList(x, y, food->GetFoodType())) {
+      food->x = x;
+      food->y = y;
       return;
     }
   }
@@ -74,12 +97,39 @@ void Game::Update() {
   int new_y = static_cast<int>(snake.head_y);
 
   // Check if there's food over here
-  if (food.x == new_x && food.y == new_y) {
-    score++;
-    PlaceFood();
-    // Grow snake and increase speed.
-    snake.GrowBody();
-    snake.speed += 0.02;
+  for(auto food : food_list){
+    if (food->x == new_x && food->y == new_y && food->GetFoodStatus() == FoodStatus::kActive) {
+      switch (food->GetFoodType())
+      {
+      case FoodType::kFood:
+        score++;
+        PlaceFood(food);
+        // Grow snake and increase speed.
+        snake.GrowBody();
+        snake.speed += 0.02; 
+        break;
+      
+      case FoodType::kBooster:
+        PlaceFood(food);
+        snake.speed +=0.02;
+        break;
+      
+      case FoodType::kPoison:
+        PlaceFood(food);
+        if(snake.size > 1){
+          snake.speed -=0.02;
+          snake.ShrinkBody();
+        }
+        break;
+
+      case FoodType::kRotten:
+        PlaceFood(food);
+        break;
+
+      default:
+        break;
+      }
+  }
   }
 }
 
