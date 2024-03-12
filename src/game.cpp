@@ -11,8 +11,9 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
       random_w(0, static_cast<int>(grid_width - 1)),
       random_h(0, static_cast<int>(grid_height - 1)) {
   // Add food of each type and display food of type food at game start
+  std::shared_ptr<Food> food;
   for (FoodType type : food_type_list) {
-    auto food = std::make_shared<Food>(type);
+    food = std::make_shared<Food>(type);
     PlaceFood(food);
     // Set food of type other than food to inactive
     if (type != FoodType::kFood) {

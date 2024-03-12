@@ -155,19 +155,20 @@ void Snake::DizziSnake() {
 
 // check for timeout and pause timer if game is paused
 void Snake::ManageThreadSleep() {
-  auto startTime = std::chrono::high_resolution_clock::now();
-  auto currentTime = std::chrono::high_resolution_clock::now();
-  auto timeDiff = currentTime - startTime;
+  auto startTime{std::chrono::high_resolution_clock::now()};
+  auto currentTime{std::chrono::high_resolution_clock::now()};
+  auto timeDiff{currentTime - startTime};
+
   while (
       std::chrono::duration_cast<std::chrono::milliseconds>(timeDiff).count() <=
       5000) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    currentTime = std::chrono::high_resolution_clock::now();
-    if (game_status == GameStatus::kPaused) {
-      auto gamePausedTime = std::chrono::high_resolution_clock::now();
-      startTime = currentTime - (startTime - gamePausedTime);
+    if (game_status != GameStatus::kPaused) {
+      currentTime = std::chrono::high_resolution_clock::now();
+      timeDiff = currentTime - startTime;
+    } else {
+      startTime = std::chrono::high_resolution_clock::now() - timeDiff;
     }
-    timeDiff = currentTime - startTime;
   }
 }
 

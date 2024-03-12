@@ -49,7 +49,7 @@ void Renderer::Render(std::shared_ptr<Snake> const snake,
   // Clear screen and change background colour if snake is dizzi
   if (snake->GetDizzing()) {
     SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x47, 0x4C, 0xFF);
-  } else if(*wall_enabled) {
+  } else if (*wall_enabled) {
     SDL_SetRenderDrawColor(sdl_renderer, 0x99, 0x99, 0x99, 0xFF);
   } else {
     SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
