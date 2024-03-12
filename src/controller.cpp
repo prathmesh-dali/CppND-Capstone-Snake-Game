@@ -9,7 +9,9 @@
 void Controller::ChangeDirection(std::shared_ptr<Snake> snake,
                                  SnakeDirection input, SnakeDirection opposite,
                                  GameStatus gameStatus) const {
+  // If game is paused or not running don't change the snake direction.
   if (gameStatus == GameStatus::kRunning) {
+    // If snake is dizzing flip the controls
     if (snake->GetDizzing()) {
       if (snake->direction != input || snake->size == 1)
         snake->direction = opposite;
@@ -25,6 +27,7 @@ void Controller::HandleInput(std::shared_ptr<Snake> snake, Game &game) const {
   SDL_Event e;
   while (SDL_PollEvent(&e)) {
     if (e.type == SDL_QUIT) {
+      // If the window is closed update the game status to closed
       game.UpdateStatus(GameStatus::kClosed);
     } else if (e.type == SDL_KEYDOWN) {
       switch (e.key.keysym.sym) {
@@ -53,6 +56,7 @@ void Controller::HandleInput(std::shared_ptr<Snake> snake, Game &game) const {
           break;
 
         case SDLK_w:
+          // If the game is not running dont toggle wall mode.
           if (game.GetStatus() == GameStatus::kRunning) {
             game.ToggleWall();
           }

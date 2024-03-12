@@ -38,7 +38,7 @@ void Snake::UpdateHead(bool* wall_enabled, int* score) {
       head_x += GetSpeed();
       break;
   }
-
+  // If wall is enabled and snake hit the wall kill the snake.
   if (*wall_enabled) {
     if (head_x > grid_width || head_x < 0 || head_y > grid_height ||
         head_y < 0) {
@@ -54,13 +54,16 @@ void Snake::UpdateHead(bool* wall_enabled, int* score) {
 float Snake::GetSpeed() { return speed + GetBoosting() * 0.1; }
 
 void Snake::MarkSnakeDead(int* score) {
+  // Mark snake dead and notify all timer thread about snake is dead
   alive = false;
   booster_cond.notify_all();
   dizzi_cond.notify_all();
+  // Dispalay popup message with score and size with game over message.
   std::string msg{"Score: " + std::to_string(*score) +
                   "\n Size: " + std::to_string(size)};
   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over!",
                            msg.c_str(), NULL);
+  // On popup close trigger window close event to close the game
   SDL_Event ev;
   ev.type = SDL_QUIT;
   SDL_PushEvent(&ev);
@@ -108,6 +111,7 @@ bool Snake::SnakeCell(int x, int y) {
   return false;
 }
 
+// Remove the snake boosting after 5 seconds
 void Snake::BoostSnake() {
   std::thread([this]() {
     if (alive) {
@@ -128,6 +132,7 @@ void Snake::BoostSnake() {
   }).detach();
 }
 
+// Remove snake dizzing status after 5 seconds
 void Snake::DizziSnake() {
   std::thread([this]() {
     if (alive) {
@@ -148,6 +153,7 @@ void Snake::DizziSnake() {
   }).detach();
 }
 
+// check for timeout and pause timer if game is paused
 void Snake::ManageThreadSleep() {
   auto startTime = std::chrono::high_resolution_clock::now();
   auto currentTime = std::chrono::high_resolution_clock::now();
@@ -178,5 +184,4 @@ bool Snake::GetDizzing() {
 void Snake::UpdateGameStatus(GameStatus gameStatus) {
   std::lock_guard<std::mutex> lock(mutex);
   this->game_status = gameStatus;
-  this->gamePausedTime = std::chrono::high_resolution_clock::now();
 }

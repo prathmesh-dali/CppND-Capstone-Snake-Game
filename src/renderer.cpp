@@ -46,7 +46,7 @@ void Renderer::Render(std::shared_ptr<Snake> const snake,
   block.w = screen_width / grid_width;
   block.h = screen_height / grid_height;
 
-  // Clear screen
+  // Clear screen and change background colour if snake is dizzi
   if (snake->GetDizzing()) {
     SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x1E, 0x1E, 0xFF);
   } else {
@@ -60,7 +60,7 @@ void Renderer::Render(std::shared_ptr<Snake> const snake,
     SDL_RenderDrawRect(sdl_renderer, &box);
   }
 
-  // Render food
+  // Render food of differnt type in differnt colour
   for (auto food : food_list) {
     switch (food->GetFoodType()) {
       case FoodType::kFood:
@@ -78,10 +78,6 @@ void Renderer::Render(std::shared_ptr<Snake> const snake,
       case FoodType::kRotten:
         SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0xCC, 0xFF, 0xFF);
         break;
-
-      default:
-        SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
-        break;
     }
     if (food->GetFoodStatus() == FoodStatus::kActive) {
       block.x = food->x * block.w;
@@ -90,7 +86,7 @@ void Renderer::Render(std::shared_ptr<Snake> const snake,
     }
   }
 
-  // Render snake's body
+  // Render snake's body if snake has booster on make snake body green
   if (snake->GetBoosting()) {
     SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0xFF, 0x00, 0xFF);
   } else {

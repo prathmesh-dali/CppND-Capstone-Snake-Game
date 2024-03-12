@@ -51,7 +51,6 @@ class Snake {
   int grid_width;
   int grid_height;
   std::mutex mutex;
-  std::chrono::time_point<std::chrono::high_resolution_clock> gamePausedTime;
   GameStatus game_status{false};
   void MarkSnakeDead(int* score);
   void ManageThreadSleep();

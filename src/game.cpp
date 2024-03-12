@@ -10,9 +10,11 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
       engine(dev()),
       random_w(0, static_cast<int>(grid_width - 1)),
       random_h(0, static_cast<int>(grid_height - 1)) {
+  // Add food of each type and display food of type food at game start
   for (FoodType type : food_type_list) {
     auto food = std::make_shared<Food>(type);
     PlaceFood(food);
+    // Set food of type other than food to inactive
     if (type != FoodType::kFood) {
       food->SetFoodInactive();
     }
@@ -71,6 +73,7 @@ void Game::Run(Controller const &controller, std::shared_ptr<Renderer> renderer,
 }
 
 bool Game::InFoodList(int x, int y, FoodType type) {
+  // Check food location is not preoccupied with existing food
   auto result =
       std::find_if(food_list.begin(), food_list.end(), [x, y, type](auto food) {
         return food->GetFoodType() != type && x == food->x && y == food->y;
@@ -99,6 +102,7 @@ void Game::Update(std::shared_ptr<Renderer> renderer) {
     return;
   }
 
+  // If snake is not alive update game status to paused
   if (!snake->alive) {
     UpdateStatus(GameStatus::kFinished);
     return;
@@ -125,6 +129,7 @@ void Game::Update(std::shared_ptr<Renderer> renderer) {
         case FoodType::kBooster:
           PlaceFood(food);
           food->SetFoodInactive();
+          // Increase speed of snake for 5 seconds
           snake->BoostSnake();
           break;
 
@@ -132,6 +137,7 @@ void Game::Update(std::shared_ptr<Renderer> renderer) {
           PlaceFood(food);
           food->SetFoodInactive();
           if (snake->size > 1) {
+            // Shrink snake and reduce the speed.
             snake->speed -= 0.02;
             snake->ShrinkBody();
           }
@@ -140,11 +146,13 @@ void Game::Update(std::shared_ptr<Renderer> renderer) {
         case FoodType::kRotten:
           PlaceFood(food);
           food->SetFoodInactive();
+          // Make snake go in opposite direction of control
           snake->DizziSnake();
           break;
       }
     } else if (food->GetFoodStatus() == FoodStatus::kInactive &&
                !food->IsLocationUpdated()) {
+      // Update food location if food locatio is not updated after inactivity
       PlaceFood(food);
     }
   }
@@ -152,6 +160,7 @@ void Game::Update(std::shared_ptr<Renderer> renderer) {
 
 void Game::UpdateStatus(GameStatus gameStatus) {
   status = gameStatus;
+  // Update food and snake about game status
   for (auto food : food_list) {
     food->UpdateGameStatus(status);
   }
@@ -159,6 +168,7 @@ void Game::UpdateStatus(GameStatus gameStatus) {
 }
 
 void Game::ToggleStatus() {
+  // Toggle game status between Paused and Running
   UpdateStatus(status == GameStatus::kRunning ? GameStatus::kPaused
                                               : GameStatus::kRunning);
 }
