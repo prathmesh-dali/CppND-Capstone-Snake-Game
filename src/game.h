@@ -38,7 +38,6 @@ class Game {
 
   int score{0};
   GameStatus status{GameStatus::kRunning};
-  // bool paused{false};
   bool InFoodList(int x, int y, FoodType type);
   void PlaceFood(std::shared_ptr<Food>);
   void Update(std::shared_ptr<Renderer> renderer);

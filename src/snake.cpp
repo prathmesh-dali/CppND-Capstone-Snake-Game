@@ -23,19 +23,19 @@ void Snake::Update(bool* wall_eanbled, int* score) {
 void Snake::UpdateHead(bool* wall_enabled, int* score) {
   switch (direction) {
     case SnakeDirection::kUp:
-      head_y -= (speed + GetBoosting() * 0.1);
+      head_y -= GetSpeed();
       break;
 
     case SnakeDirection::kDown:
-      head_y += (speed + GetBoosting() * 0.1);
+      head_y += GetSpeed();
       break;
 
     case SnakeDirection::kLeft:
-      head_x -= (speed + GetBoosting() * 0.1);
+      head_x -= GetSpeed();
       break;
 
     case SnakeDirection::kRight:
-      head_x += (speed + GetBoosting() * 0.1);
+      head_x += GetSpeed();
       break;
   }
 
@@ -49,6 +49,10 @@ void Snake::UpdateHead(bool* wall_enabled, int* score) {
   // Wrap the Snake around to the beginning if going off of the screen.
   head_x = fmod(head_x + grid_width, grid_width);
   head_y = fmod(head_y + grid_height, grid_height);
+}
+
+float Snake::GetSpeed(){
+  return speed + GetBoosting() * 0.1;
 }
 
 void Snake::MarkSnakeDead(int* score) {
@@ -116,20 +120,7 @@ void Snake::BoostSnake() {
       if (alive) {
         boosting = true;
         uLock.unlock();
-        auto startTime = std::chrono::high_resolution_clock::now();
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        auto timeDiff = currentTime - startTime;
-        while (std::chrono::duration_cast<std::chrono::milliseconds>(timeDiff)
-                   .count() <= 5000) {
-          std::this_thread::sleep_for(std::chrono::milliseconds(1));
-          currentTime = std::chrono::high_resolution_clock::now();
-          if (game_status == GameStatus::kPaused) {
-            auto gamePausedTime = std::chrono::high_resolution_clock::now();
-            auto gameExecTime = startTime - gamePausedTime;
-            startTime = currentTime - gameExecTime;
-          }
-          timeDiff = currentTime - startTime;
-        }
+        ManageThreadSleep();
         uLock.lock();
         boosting = false;
         uLock.unlock();
@@ -149,20 +140,7 @@ void Snake::DizziSnake() {
       if (alive) {
         dizzing = true;
         uLock.unlock();
-        auto startTime = std::chrono::high_resolution_clock::now();
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        auto timeDiff = currentTime - startTime;
-        while (std::chrono::duration_cast<std::chrono::milliseconds>(timeDiff)
-                   .count() <= 5000) {
-          std::this_thread::sleep_for(std::chrono::milliseconds(1));
-          currentTime = std::chrono::high_resolution_clock::now();
-          if (game_status == GameStatus::kPaused) {
-            auto gamePausedTime = std::chrono::high_resolution_clock::now();
-            auto gameExecTime = startTime - gamePausedTime;
-            startTime = currentTime - gameExecTime;
-          }
-          timeDiff = currentTime - startTime;
-        }
+        ManageThreadSleep();
         uLock.lock();
         dizzing = false;
         uLock.unlock();
@@ -170,6 +148,23 @@ void Snake::DizziSnake() {
       }
     }
   }).detach();
+}
+
+void Snake::ManageThreadSleep() {
+  auto startTime = std::chrono::high_resolution_clock::now();
+  auto currentTime = std::chrono::high_resolution_clock::now();
+  auto timeDiff = currentTime - startTime;
+  while (
+      std::chrono::duration_cast<std::chrono::milliseconds>(timeDiff).count() <=
+      5000) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    currentTime = std::chrono::high_resolution_clock::now();
+    if (game_status == GameStatus::kPaused) {
+      auto gamePausedTime = std::chrono::high_resolution_clock::now();
+      startTime = currentTime - (startTime - gamePausedTime);
+    }
+    timeDiff = currentTime - startTime;
+  }
 }
 
 bool Snake::GetBoosting() {

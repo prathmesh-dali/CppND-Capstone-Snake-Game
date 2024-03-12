@@ -23,6 +23,7 @@ class Snake {
   void GrowBody();
   void ShrinkBody();
   bool SnakeCell(int x, int y);
+  float GetSpeed();
 
   SnakeDirection direction = SnakeDirection::kUp;
 
@@ -53,6 +54,7 @@ class Snake {
   std::chrono::time_point<std::chrono::high_resolution_clock> gamePausedTime;
   GameStatus game_status{false};
   void MarkSnakeDead(int* score);
+  void ManageThreadSleep();
 };
 
 #endif

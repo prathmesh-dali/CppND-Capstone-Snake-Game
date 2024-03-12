@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include <algorithm>
 #include <iostream>
 
 #include "SDL.h"
@@ -32,7 +33,6 @@ void Game::Run(Controller const &controller, std::shared_ptr<Renderer> renderer,
   Uint32 frame_end;
   Uint32 frame_duration;
   int frame_count = 0;
-  // GameStatus running = GameStatus::kRunning;
 
   while (status != GameStatus::kClosed) {
     frame_start = SDL_GetTicks();
@@ -71,15 +71,11 @@ void Game::Run(Controller const &controller, std::shared_ptr<Renderer> renderer,
 }
 
 bool Game::InFoodList(int x, int y, FoodType type) {
-  for (auto food : food_list) {
-    if (food->GetFoodType() == type) {
-      continue;
-    }
-    if (x == food->x && y == food->y) {
-      return true;
-    }
-  }
-  return false;
+  auto result =
+      std::find_if(food_list.begin(), food_list.end(), [x, y, type](auto food) {
+        return food->GetFoodType() != type && x == food->x && y == food->y;
+      });
+  return result != food_list.end();
 }
 
 void Game::PlaceFood(std::shared_ptr<Food> food) {
