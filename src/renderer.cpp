@@ -48,7 +48,9 @@ void Renderer::Render(std::shared_ptr<Snake> const snake,
 
   // Clear screen and change background colour if snake is dizzi
   if (snake->GetDizzing()) {
-    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x1E, 0x1E, 0xFF);
+    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x47, 0x4C, 0xFF);
+  } else if(*wall_enabled) {
+    SDL_SetRenderDrawColor(sdl_renderer, 0x99, 0x99, 0x99, 0xFF);
   } else {
     SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
   }
@@ -72,11 +74,11 @@ void Renderer::Render(std::shared_ptr<Snake> const snake,
         break;
 
       case FoodType::kPoison:
-        SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
+        SDL_SetRenderDrawColor(sdl_renderer, 0x88, 0x08, 0x08, 0xFF);
         break;
 
       case FoodType::kRotten:
-        SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0xCC, 0xFF, 0xFF);
+        SDL_SetRenderDrawColor(sdl_renderer, 0xCC, 0x55, 0x00, 0xFF);
         break;
     }
     if (food->GetFoodStatus() == FoodStatus::kActive) {
