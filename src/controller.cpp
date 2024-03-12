@@ -7,8 +7,7 @@
 #include "snake.h"
 
 void Controller::ChangeDirection(std::shared_ptr<Snake> snake,
-                                 SnakeDirection input,
-                                 SnakeDirection opposite,
+                                 SnakeDirection input, SnakeDirection opposite,
                                  GameStatus gameStatus) const {
   if (gameStatus == GameStatus::kRunning) {
     if (snake->GetDizzing()) {
@@ -40,13 +39,13 @@ void Controller::HandleInput(std::shared_ptr<Snake> snake, Game &game) const {
           break;
 
         case SDLK_LEFT:
-          ChangeDirection(snake, SnakeDirection::kLeft,
-                          SnakeDirection::kRight, game.GetStatus());
+          ChangeDirection(snake, SnakeDirection::kLeft, SnakeDirection::kRight,
+                          game.GetStatus());
           break;
 
         case SDLK_RIGHT:
-          ChangeDirection(snake, SnakeDirection::kRight,
-                          SnakeDirection::kLeft, game.GetStatus());
+          ChangeDirection(snake, SnakeDirection::kRight, SnakeDirection::kLeft,
+                          game.GetStatus());
           break;
 
         case SDLK_ESCAPE:
