@@ -1,5 +1,7 @@
 #include "game.h"
+
 #include <iostream>
+
 #include "SDL.h"
 
 Game::Game(std::size_t grid_width, std::size_t grid_height)
@@ -7,19 +9,18 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
       engine(dev()),
       random_w(0, static_cast<int>(grid_width - 1)),
       random_h(0, static_cast<int>(grid_height - 1)) {
-        
-        for(FoodType type: food_type_list){
-          auto food = std::make_shared<Food>(type);
-          PlaceFood(food);
-          if(type != FoodType::kFood){
-            food->SetFoodInactive();
-          }
-          food_list.emplace_back(food);
-        }  
+  for (FoodType type : food_type_list) {
+    auto food = std::make_shared<Food>(type);
+    PlaceFood(food);
+    if (type != FoodType::kFood) {
+      food->SetFoodInactive();
+    }
+    food_list.emplace_back(food);
+  }
 }
 
-Game::~Game(){
-  for(auto food: food_list){
+Game::~Game() {
+  for (auto food : food_list) {
     food->UpdateGameStatus(GameStatus::kClosed);
   }
 }
@@ -50,12 +51,12 @@ void Game::Run(Controller const &controller, std::shared_ptr<Renderer> renderer,
 
     // After every second, update the window title.
     if (frame_end - title_timestamp >= 1000) {
-      if(status == GameStatus::kRunning){
+      if (status == GameStatus::kRunning) {
         renderer->UpdateWindowTitle(score, frame_count);
-      } else if(status == GameStatus::kPaused){
+      } else if (status == GameStatus::kPaused) {
         renderer->UpdateWindowTitlePaused(score);
-      } 
-      
+      }
+
       frame_count = 0;
       title_timestamp = frame_end;
     }
@@ -69,9 +70,9 @@ void Game::Run(Controller const &controller, std::shared_ptr<Renderer> renderer,
   }
 }
 
-bool Game::InFoodList(int x, int y, FoodType type){
+bool Game::InFoodList(int x, int y, FoodType type) {
   for (auto food : food_list) {
-    if(food->GetFoodType() == type){
+    if (food->GetFoodType() == type) {
       continue;
     }
     if (x == food->x && y == food->y) {
@@ -98,8 +99,7 @@ void Game::PlaceFood(std::shared_ptr<Food> food) {
 }
 
 void Game::Update(std::shared_ptr<Renderer> renderer) {
-
-  if(status != GameStatus::kRunning){
+  if (status != GameStatus::kRunning) {
     return;
   }
 
@@ -114,60 +114,60 @@ void Game::Update(std::shared_ptr<Renderer> renderer) {
   int new_y = static_cast<int>(snake->head_y);
 
   // Check if there's food over here
-  for(auto food : food_list){
-    if (food->x == new_x && food->y == new_y && food->GetFoodStatus() == FoodStatus::kActive) {
-      switch (food->GetFoodType())
-      {
-      case FoodType::kFood:
-        score++;
-        PlaceFood(food);
-        // Grow snake and increase speed.
-        snake->GrowBody();
-        snake->speed += 0.02; 
-        break;
-      
-      case FoodType::kBooster:
-        PlaceFood(food);
-        food->SetFoodInactive();
-        snake->BoostSnake();
-        break;
-      
-      case FoodType::kPoison:
-        PlaceFood(food);
-        food->SetFoodInactive();
-        if(snake->size > 1){
-          snake->speed -=0.02;
-          snake->ShrinkBody();
-        }
-        break;
+  for (auto food : food_list) {
+    if (food->x == new_x && food->y == new_y &&
+        food->GetFoodStatus() == FoodStatus::kActive) {
+      switch (food->GetFoodType()) {
+        case FoodType::kFood:
+          score++;
+          PlaceFood(food);
+          // Grow snake and increase speed.
+          snake->GrowBody();
+          snake->speed += 0.02;
+          break;
 
-      case FoodType::kRotten:
-        PlaceFood(food);
-        food->SetFoodInactive();
-        snake->DizziSnake();
-        break;
+        case FoodType::kBooster:
+          PlaceFood(food);
+          food->SetFoodInactive();
+          snake->BoostSnake();
+          break;
+
+        case FoodType::kPoison:
+          PlaceFood(food);
+          food->SetFoodInactive();
+          if (snake->size > 1) {
+            snake->speed -= 0.02;
+            snake->ShrinkBody();
+          }
+          break;
+
+        case FoodType::kRotten:
+          PlaceFood(food);
+          food->SetFoodInactive();
+          snake->DizziSnake();
+          break;
       }
-  } else if(food->GetFoodStatus() == FoodStatus::kInactive && !food->IsLocationUpdated()){
-    PlaceFood(food);
-  }
+    } else if (food->GetFoodStatus() == FoodStatus::kInactive &&
+               !food->IsLocationUpdated()) {
+      PlaceFood(food);
+    }
   }
 }
 
-void Game::UpdateStatus(GameStatus gameStatus){
+void Game::UpdateStatus(GameStatus gameStatus) {
   status = gameStatus;
-  for(auto food: food_list){
+  for (auto food : food_list) {
     food->UpdateGameStatus(status);
   }
   snake->UpdateGameStatus(status);
 }
 
-void Game::ToggleStatus(){
-  UpdateStatus(status == GameStatus::kRunning ? GameStatus::kPaused : GameStatus::kRunning);
+void Game::ToggleStatus() {
+  UpdateStatus(status == GameStatus::kRunning ? GameStatus::kPaused
+                                              : GameStatus::kRunning);
 }
 
-void Game::ToggleWall(){
-  wall_enabled_ = !wall_enabled_;
-}
+void Game::ToggleWall() { wall_enabled_ = !wall_enabled_; }
 
 GameStatus Game::GetStatus() const { return status; }
 int Game::GetScore() const { return score; }

@@ -1,4 +1,5 @@
 #include "snake.h"
+
 #include <cmath>
 #include <iostream>
 
@@ -21,25 +22,26 @@ void Snake::Update(bool* wall_eanbled, int* score) {
 
 void Snake::UpdateHead(bool* wall_enabled, int* score) {
   switch (direction) {
-    case Direction::kUp:
+    case SnakeDirection::kUp:
       head_y -= (speed + GetBoosting() * 0.1);
       break;
 
-    case Direction::kDown:
+    case SnakeDirection::kDown:
       head_y += (speed + GetBoosting() * 0.1);
       break;
 
-    case Direction::kLeft:
+    case SnakeDirection::kLeft:
       head_x -= (speed + GetBoosting() * 0.1);
       break;
 
-    case Direction::kRight:
+    case SnakeDirection::kRight:
       head_x += (speed + GetBoosting() * 0.1);
       break;
   }
 
-  if(*wall_enabled){
-    if(head_x > grid_width || head_x < 0 || head_y > grid_height || head_y < 0){
+  if (*wall_enabled) {
+    if (head_x > grid_width || head_x < 0 || head_y > grid_height ||
+        head_y < 0) {
       MarkSnakeDead(score);
     }
   }
@@ -49,18 +51,21 @@ void Snake::UpdateHead(bool* wall_enabled, int* score) {
   head_y = fmod(head_y + grid_height, grid_height);
 }
 
-void Snake::MarkSnakeDead(int* score){
+void Snake::MarkSnakeDead(int* score) {
   alive = false;
   booster_cond.notify_all();
   dizzi_cond.notify_all();
-  std::string msg{"Score: " + std::to_string(*score) + "\n Size: " + std::to_string(size)};
-  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over!", msg.c_str(), NULL);
+  std::string msg{"Score: " + std::to_string(*score) +
+                  "\n Size: " + std::to_string(size)};
+  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over!",
+                           msg.c_str(), NULL);
   SDL_Event ev;
   ev.type = SDL_QUIT;
   SDL_PushEvent(&ev);
 }
 
-void Snake::UpdateBody(SDL_Point &current_head_cell, SDL_Point &prev_head_cell, int* score) {
+void Snake::UpdateBody(SDL_Point& current_head_cell, SDL_Point& prev_head_cell,
+                       int* score) {
   // Add previous head location to vector
   body.push_back(prev_head_cell);
 
@@ -71,14 +76,14 @@ void Snake::UpdateBody(SDL_Point &current_head_cell, SDL_Point &prev_head_cell, 
     growing = false;
     size++;
   }
-  if(shrinking && size > 1){
+  if (shrinking && size > 1) {
     shrinking = false;
     size--;
     body.erase(body.begin());
   }
 
   // Check if the snake has died.
-  for (auto const &item : body) {
+  for (auto const& item : body) {
     if (current_head_cell.x == item.x && current_head_cell.y == item.y) {
       MarkSnakeDead(score);
     }
@@ -93,7 +98,7 @@ bool Snake::SnakeCell(int x, int y) {
   if (x == static_cast<int>(head_x) && y == static_cast<int>(head_y)) {
     return true;
   }
-  for (auto const &item : body) {
+  for (auto const& item : body) {
     if (x == item.x && y == item.y) {
       return true;
     }
@@ -101,32 +106,32 @@ bool Snake::SnakeCell(int x, int y) {
   return false;
 }
 
-
-void Snake::BoostSnake(){
-  std::thread([this](){
-    if(alive){
+void Snake::BoostSnake() {
+  std::thread([this]() {
+    if (alive) {
       std::unique_lock<std::mutex> uLock(mutex);
-      if(boosting){
+      if (boosting) {
         booster_cond.wait(uLock);
       }
-      if(alive){
+      if (alive) {
         boosting = true;
         uLock.unlock();
         auto startTime = std::chrono::high_resolution_clock::now();
         auto currentTime = std::chrono::high_resolution_clock::now();
         auto timeDiff = currentTime - startTime;
-        while(std::chrono::duration_cast<std::chrono::milliseconds>(timeDiff).count()<=5000){
+        while (std::chrono::duration_cast<std::chrono::milliseconds>(timeDiff)
+                   .count() <= 5000) {
           std::this_thread::sleep_for(std::chrono::milliseconds(1));
           currentTime = std::chrono::high_resolution_clock::now();
-          if(game_status == GameStatus::kPaused){
+          if (game_status == GameStatus::kPaused) {
             auto gamePausedTime = std::chrono::high_resolution_clock::now();
             auto gameExecTime = startTime - gamePausedTime;
             startTime = currentTime - gameExecTime;
-          } 
+          }
           timeDiff = currentTime - startTime;
         }
         uLock.lock();
-        boosting =false;
+        boosting = false;
         uLock.unlock();
         booster_cond.notify_one();
       }
@@ -134,31 +139,32 @@ void Snake::BoostSnake(){
   }).detach();
 }
 
-void Snake::DizziSnake(){
-  std::thread([this](){
-    if(alive){
+void Snake::DizziSnake() {
+  std::thread([this]() {
+    if (alive) {
       std::unique_lock<std::mutex> uLock(mutex);
-      if(dizzing){
+      if (dizzing) {
         dizzi_cond.wait(uLock);
       }
-      if(alive){
+      if (alive) {
         dizzing = true;
         uLock.unlock();
         auto startTime = std::chrono::high_resolution_clock::now();
         auto currentTime = std::chrono::high_resolution_clock::now();
         auto timeDiff = currentTime - startTime;
-        while(std::chrono::duration_cast<std::chrono::milliseconds>(timeDiff).count()<=5000){
+        while (std::chrono::duration_cast<std::chrono::milliseconds>(timeDiff)
+                   .count() <= 5000) {
           std::this_thread::sleep_for(std::chrono::milliseconds(1));
           currentTime = std::chrono::high_resolution_clock::now();
-          if(game_status == GameStatus::kPaused){
+          if (game_status == GameStatus::kPaused) {
             auto gamePausedTime = std::chrono::high_resolution_clock::now();
             auto gameExecTime = startTime - gamePausedTime;
             startTime = currentTime - gameExecTime;
-          } 
+          }
           timeDiff = currentTime - startTime;
         }
         uLock.lock();
-        dizzing =false;
+        dizzing = false;
         uLock.unlock();
         dizzi_cond.notify_one();
       }
@@ -166,18 +172,17 @@ void Snake::DizziSnake(){
   }).detach();
 }
 
-
-bool Snake::GetBoosting(){
+bool Snake::GetBoosting() {
   std::lock_guard<std::mutex> lock(mutex);
   return boosting;
 }
 
-bool Snake::GetDizzing(){
+bool Snake::GetDizzing() {
   std::lock_guard<std::mutex> lock(mutex);
   return dizzing;
 }
 
-void Snake::UpdateGameStatus(GameStatus gameStatus){
+void Snake::UpdateGameStatus(GameStatus gameStatus) {
   std::lock_guard<std::mutex> lock(mutex);
   this->game_status = gameStatus;
   this->gamePausedTime = std::chrono::high_resolution_clock::now();

@@ -1,17 +1,17 @@
 #ifndef SNAKE_H
 #define SNAKE_H
 
-#include <vector>
-#include <thread>
+#include <chrono>
 #include <condition_variable>
 #include <mutex>
-#include <chrono>
+#include <thread>
+#include <vector>
+
 #include "SDL.h"
 #include "enums.h"
 
 class Snake {
  public:
-  enum class Direction { kUp, kDown, kLeft, kRight };
 
   Snake(int grid_width, int grid_height)
       : grid_width(grid_width),
@@ -25,7 +25,7 @@ class Snake {
   void ShrinkBody();
   bool SnakeCell(int x, int y);
 
-  Direction direction = Direction::kUp;
+  SnakeDirection direction = SnakeDirection::kUp;
 
   float speed{0.1f};
   int size{1};
@@ -38,10 +38,10 @@ class Snake {
   void DizziSnake();
   bool GetDizzing();
   void UpdateGameStatus(GameStatus gameStatus);
-  
+
  private:
   void UpdateHead(bool* wall_enabled, int* score);
-  void UpdateBody(SDL_Point &current_cell, SDL_Point &prev_cell, int* score);
+  void UpdateBody(SDL_Point& current_cell, SDL_Point& prev_cell, int* score);
   bool growing{false};
   bool shrinking{false};
   bool dizzing{false};

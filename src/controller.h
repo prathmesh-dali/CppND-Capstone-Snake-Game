@@ -2,6 +2,7 @@
 #define CONTROLLER_H
 
 #include "snake.h"
+#include "enums.h"
 
 class Game;
 
@@ -10,8 +11,8 @@ class Controller {
   void HandleInput(std::shared_ptr<Snake> snake, Game &game) const;
 
  private:
-  void ChangeDirection(std::shared_ptr<Snake> snake, Snake::Direction input,
-                       Snake::Direction opposite, GameStatus gameStatus) const;
+  void ChangeDirection(std::shared_ptr<Snake> snake, SnakeDirection input,
+                       SnakeDirection opposite, GameStatus gameStatus) const;
 };
 
 #endif

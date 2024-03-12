@@ -3,12 +3,13 @@
 
 #include <random>
 #include <vector>
+
 #include "SDL.h"
 #include "controller.h"
+#include "enums.h"
+#include "food.h"
 #include "renderer.h"
 #include "snake.h"
-#include "food.h"
-#include "enums.h"
 
 class Game {
  public:
@@ -26,7 +27,9 @@ class Game {
  private:
   std::shared_ptr<Snake> snake;
   std::vector<std::shared_ptr<Food>> food_list;
-  std::vector<FoodType> const food_type_list{FoodType::kFood, FoodType::kBooster, FoodType::kPoison, FoodType::kRotten};
+  std::vector<FoodType> const food_type_list{
+      FoodType::kFood, FoodType::kBooster, FoodType::kPoison,
+      FoodType::kRotten};
 
   std::random_device dev;
   std::mt19937 engine;

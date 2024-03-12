@@ -2,9 +2,10 @@
 #define RENDERER_H
 
 #include <vector>
+
 #include "SDL.h"
-#include "snake.h"
 #include "food.h"
+#include "snake.h"
 
 class Renderer {
  public:
@@ -12,7 +13,9 @@ class Renderer {
            const std::size_t grid_width, const std::size_t grid_height);
   ~Renderer();
 
-  void Render(std::shared_ptr<Snake> const snake, std::vector<std::shared_ptr<Food>> const food_list, bool* wall_enabled);
+  void Render(std::shared_ptr<Snake> const snake,
+              std::vector<std::shared_ptr<Food>> const food_list,
+              bool *wall_enabled);
   void UpdateWindowTitle(int score, int fps);
   void UpdateWindowTitlePaused(int score);
 

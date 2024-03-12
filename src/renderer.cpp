@@ -1,4 +1,5 @@
 #include "renderer.h"
+
 #include <iostream>
 #include <string>
 
@@ -38,51 +39,51 @@ Renderer::~Renderer() {
   SDL_Quit();
 }
 
-void Renderer::Render(std::shared_ptr<Snake> const snake, std::vector<std::shared_ptr<Food>> const food_list, bool* wall_enabled) {
+void Renderer::Render(std::shared_ptr<Snake> const snake,
+                      std::vector<std::shared_ptr<Food>> const food_list,
+                      bool* wall_enabled) {
   SDL_Rect block;
   block.w = screen_width / grid_width;
   block.h = screen_height / grid_height;
 
   // Clear screen
-  if(snake->GetDizzing()){
+  if (snake->GetDizzing()) {
     SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x1E, 0x1E, 0xFF);
   } else {
     SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
   }
   SDL_RenderClear(sdl_renderer);
 
-  if(*wall_enabled){
-    SDL_SetRenderDrawColor(sdl_renderer , 0x7E, 0x41, 0x1F, 0xFF);  // brown
-    SDL_Rect box = { 0 ,0 , 640 , 640}; // rectangle around the window
-    SDL_RenderDrawRect(sdl_renderer , &box);
+  if (*wall_enabled) {
+    SDL_SetRenderDrawColor(sdl_renderer, 0x7E, 0x41, 0x1F, 0xFF);  // brown
+    SDL_Rect box = {0, 0, 640, 640};  // rectangle around the window
+    SDL_RenderDrawRect(sdl_renderer, &box);
   }
 
   // Render food
-  for(auto food : food_list){
+  for (auto food : food_list) {
+    switch (food->GetFoodType()) {
+      case FoodType::kFood:
+        SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
+        break;
 
-    switch (food->GetFoodType())
-    {
-    case FoodType::kFood:
-      SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
-      break;
-    
-    case FoodType::kBooster:
-      SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0xFF, 0x00, 0xFF);
-      break;
+      case FoodType::kBooster:
+        SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0xFF, 0x00, 0xFF);
+        break;
 
-    case FoodType::kPoison:
-      SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
-      break;
+      case FoodType::kPoison:
+        SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
+        break;
 
-    case FoodType::kRotten:
-      SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0xCC, 0xFF, 0xFF);
-      break;
+      case FoodType::kRotten:
+        SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0xCC, 0xFF, 0xFF);
+        break;
 
-    default:
-      SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
-      break;
+      default:
+        SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
+        break;
     }
-    if(food->GetFoodStatus() == FoodStatus::kActive){
+    if (food->GetFoodStatus() == FoodStatus::kActive) {
       block.x = food->x * block.w;
       block.y = food->y * block.h;
       SDL_RenderFillRect(sdl_renderer, &block);
@@ -90,12 +91,12 @@ void Renderer::Render(std::shared_ptr<Snake> const snake, std::vector<std::share
   }
 
   // Render snake's body
-  if(snake->GetBoosting()){
+  if (snake->GetBoosting()) {
     SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0xFF, 0x00, 0xFF);
   } else {
     SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
   }
-  for (SDL_Point const &point : snake->body) {
+  for (SDL_Point const& point : snake->body) {
     block.x = point.x * block.w;
     block.y = point.y * block.h;
     SDL_RenderFillRect(sdl_renderer, &block);
@@ -116,11 +117,13 @@ void Renderer::Render(std::shared_ptr<Snake> const snake, std::vector<std::share
 }
 
 void Renderer::UpdateWindowTitle(int score, int fps) {
-  std::string title{"Snake Score: " + std::to_string(score) + " FPS: " + std::to_string(fps)};
+  std::string title{"Snake Score: " + std::to_string(score) +
+                    " FPS: " + std::to_string(fps)};
   SDL_SetWindowTitle(sdl_window, title.c_str());
 }
 
 void Renderer::UpdateWindowTitlePaused(int score) {
-  std::string title{"The game is paused. Press ESC to Resume. Snake Score: " + std::to_string(score)};
+  std::string title{"The game is paused. Press ESC to Resume. Snake Score: " +
+                    std::to_string(score)};
   SDL_SetWindowTitle(sdl_window, title.c_str());
 }
