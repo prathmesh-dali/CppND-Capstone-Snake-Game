@@ -53,7 +53,7 @@ void Controller::HandleInput(std::shared_ptr<Snake> snake, Game &game) const {
           break;
 
         case SDLK_w:
-          if(game.GetStatus() == GameStatus::kRunning){
+          if (game.GetStatus() == GameStatus::kRunning) {
             game.ToggleWall();
           }
           break;

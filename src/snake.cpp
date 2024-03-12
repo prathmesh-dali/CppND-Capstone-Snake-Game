@@ -51,9 +51,7 @@ void Snake::UpdateHead(bool* wall_enabled, int* score) {
   head_y = fmod(head_y + grid_height, grid_height);
 }
 
-float Snake::GetSpeed(){
-  return speed + GetBoosting() * 0.1;
-}
+float Snake::GetSpeed() { return speed + GetBoosting() * 0.1; }
 
 void Snake::MarkSnakeDead(int* score) {
   alive = false;
